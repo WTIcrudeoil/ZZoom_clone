@@ -12,4 +12,12 @@ html(lang="en")
         main
             h3 Welcome to ZZoom
             button call
+            ul
+                form#nick
+                    input(type="text", placeholder="choose a nickname",required)
+                    button Send   
+            ul
+                form#msg
+                    input(type="text", placeholder="write a msg",required)
+                    button Send        
         script(src="/public/js/app.js")
