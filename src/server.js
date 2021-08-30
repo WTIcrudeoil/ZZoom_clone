@@ -1,6 +1,7 @@
 import express from "express";
+import SocketIo from "socket.io";
 import http from "http";
-import WebSocket from "ws";
+
 
 const app = express();
 
@@ -16,33 +17,47 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 //app.listen(3000,handleListen);
 
 const server = http.createServer(app);
-const wss = new WebSocket.Server({server});
 
-const sockets = [];
+const wsServer = SocketIo(server);
 
-wss.on("connection",(socket)=>{
-    //console.log(socket);
-    sockets.push(socket);
-    socket["nickname"] ="Anon"; //nickname for anonyous user
-    console.log("Connected to Browser✅");
-    socket.on("close",()=> console.log("Disconnect from the Browser❌"))
-    socket.on("message",(msg)=>{
-        const message = JSON.parse(msg);
-        switch(message.type){
-            case "new_message":
-                sockets.forEach(aSocket => aSocket.send(`${socket.nickname} : ${message.payload.toString("utf8")}`));
-            case "nickname":
-                socket["nickname"]=message.payload
-        }
-        /*
-        if(parsed.type === "new_message"){
-
-            sockets.forEach(aSocket => aSocket.send(parsed.payload.toString("utf8")));
-        } else if(parsed.type === "nickname"){
-            console.log(parsed.payload);
-        }
-        */
+wsServer.on("connection",(socket) =>{
+    socket.onAny((event)=>{
+        console.log(`socket Event:${event}`);
     });
-});
+    socket.on("enter_room",(roomname,done)=>{
+        socket.join(roomname);
+        done();
+      
+    });
+})
+
+//const wss = new WebSocket.Server({server});
+
+//const sockets = [];
+
+// wss.on("connection",(socket)=>{
+//     //console.log(socket);
+//     sockets.push(socket);
+//     socket["nickname"] ="Anon"; //nickname for anonyous user
+//     console.log("Connected to Browser✅");
+//     socket.on("close",()=> console.log("Disconnect from the Browser❌"))
+//     socket.on("message",(msg)=>{
+//         const message = JSON.parse(msg);
+//         switch(message.type){
+//             case "new_message":
+//                 sockets.forEach(aSocket => aSocket.send(`${socket.nickname} : ${message.payload.toString("utf8")}`));
+//             case "nickname":
+//                 socket["nickname"]=message.payload
+//         }
+//         /*
+//         if(parsed.type === "new_message"){
+
+//             sockets.forEach(aSocket => aSocket.send(parsed.payload.toString("utf8")));
+//         } else if(parsed.type === "nickname"){
+//             console.log(parsed.payload);
+//         }
+//         */
+//     });
+// });
 
 server.listen(3000,handleListen);
