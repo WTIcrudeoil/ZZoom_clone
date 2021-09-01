@@ -21,14 +21,24 @@ const server = http.createServer(app);
 const wsServer = SocketIo(server);
 
 wsServer.on("connection",(socket) =>{
+    console.log(socket);
+
     socket.onAny((event)=>{
         console.log(`socket Event:${event}`);
     });
-    socket.on("enter_room",(roomname,done)=>{
-        socket.join(roomname);
+    socket.on("enter_room",(roomName,done)=>{
+        socket.join(roomName);
+    
         done();
-      
+        socket.to(roomName).emit("welcome");
     });
+    socket.on("disconnecting",()=>{
+        socket.rooms.forEach(room => socket.to(room).emit("bye"))
+    });
+    socket.on("new_message",(msg,room,done)=>{
+        socket.to(room).emit("new_message",msg);
+        done();//이 코드는 서버단에서 실행되지않음
+    })
 })
 
 //const wss = new WebSocket.Server({server});
