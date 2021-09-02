@@ -21,7 +21,7 @@ const server = http.createServer(app);
 const wsServer = SocketIo(server);
 
 wsServer.on("connection",(socket) =>{
-    console.log(socket);
+    socket["nickname"]="Anon"
 
     socket.onAny((event)=>{
         console.log(`socket Event:${event}`);
@@ -30,15 +30,16 @@ wsServer.on("connection",(socket) =>{
         socket.join(roomName);
     
         done();
-        socket.to(roomName).emit("welcome");
+        socket.to(roomName).emit("welcome",socket.nickname);
     });
     socket.on("disconnecting",()=>{
-        socket.rooms.forEach(room => socket.to(room).emit("bye"))
+        socket.rooms.forEach(room => socket.to(room).emit("bye",socket.nickname))
     });
     socket.on("new_message",(msg,room,done)=>{
-        socket.to(room).emit("new_message",msg);
+        socket.to(room).emit("new_message",`${socket.nickname} : ${msg}`);
         done();//이 코드는 서버단에서 실행되지않음
     })
+    socket.on("nickname",nickname => (socket["nickname"]=nickname))
 })
 
 //const wss = new WebSocket.Server({server});
