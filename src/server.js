@@ -21,6 +21,13 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 const server = http.createServer(app);
 const wsServer = SocketIo(server);
 
+wsServer.on("connection",(socket)=>{
+    socket.on("join_room",(roomName,done)=>{
+        socket.join(roomName);
+        done();
+        socket.to(roomName).emit("welcome");
+    })
+})
 
 /* chat part */
 /*
