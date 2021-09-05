@@ -1,5 +1,6 @@
 import express from "express";
 import {Server} from "socket.io";
+import SocketIo from "socket.io";
 import http from "http";
 import {instrument} from "@socket.io/admin-ui";
 
@@ -18,7 +19,11 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 //app.listen(3000,handleListen);
 
 const server = http.createServer(app);
+const wsServer = SocketIo(server);
 
+
+/* chat part */
+/*
 const wsServer = new Server(server,{
     cors:{
         origin:["https://admin.socket.io"],
@@ -72,6 +77,8 @@ wsServer.on("connection",(socket) =>{
     })
     socket.on("nickname",nickname => (socket["nickname"]=nickname))
 })
+*/
+//-------------- end of chat part --------------
 
 //const wss = new WebSocket.Server({server});
 
